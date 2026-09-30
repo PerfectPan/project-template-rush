@@ -21,3 +21,11 @@ build/
 coverage/
 tmp/
 temp/
+
+# Rush
+common/temp/
+common/deploy/
+common/autoinstallers/*/.npmrc
+**/.rush/temp/
+rush-logs/
+*.tsbuildinfo

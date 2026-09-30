@@ -2,28 +2,30 @@
 
 ## Development Setup
 
-Replace this section with project-specific setup instructions.
+Requirements: the Node.js version in `.node-version` (Node 24 LTS) and Git. Rush and pnpm are downloaded on demand
+at the versions pinned in `rush.json`; a global install is optional.
 
 ```bash
 # install local Git hooks
 ./scripts/install-git-hooks.sh
 
-# run repository checks
-./scripts/check-repository.sh
+# install dependencies from the committed lockfile
+node common/scripts/install-run-rush.js install
 
-# check a PR or MR title
-./scripts/check-pr-title.sh "docs: update project template"
+# after changing dependencies in any package.json, refresh the lockfile and commit it
+node common/scripts/install-run-rush.js update
 
-# check a PR or MR description from a file or stdin
-./scripts/check-pr-body.sh pr-body.md
+# run the full local gate
+npm run check
 
-# preview GitHub repository protection setup
-./scripts/configure-github-repository.sh --repo OWNER/REPO
-
-# install dependencies
-# run tests
-# run local app or CLI
+# work on one package; rushx runs that package's scripts (needs a global `npm i -g @microsoft/rush`)
+cd packages/example && rushx test
 ```
+
+To add a package, copy `packages/example`, rename it, register it in `rush.json` with `"versionPolicyName": "main"`
+(or `"shouldPublish": false` for a private package), and run `node common/scripts/install-run-rush.js update`.
+Each package owns its toolchain devDependencies; `ensureConsistentVersions` in `rush.json` keeps their versions
+identical across packages.
 
 ## Contribution Flow
 
@@ -44,14 +46,15 @@ Small typo corrections, narrow documentation fixes, and repository metadata upda
 
 ## Required Checks
 
-Replace these placeholders after choosing the project stack:
-
 ```bash
 # Local Git hooks:
 ./scripts/install-git-hooks.sh
 
-# Repository checks:
-./scripts/check-repository.sh
+# Aggregate gate: format:check, build, lint, typecheck, test, repository checks:
+npm run check
+
+# Change files for package changes (compares with origin/main; CI runs it on every PR):
+npm run change:verify
 
 # PR/MR title:
 ./scripts/check-pr-title.sh "docs: update project template"
@@ -62,16 +65,31 @@ Replace these placeholders after choosing the project stack:
 # GitHub repository setup dry run:
 ./scripts/configure-github-repository.sh --repo OWNER/REPO
 
-# Format:
-
-# Lint:
-
-# Test:
-
-# Build:
-
 # Package or release dry-run:
+npm run publish:dry-run
 ```
+
+## Change Files
+
+Rush builds changelogs and version bumps from change files in `common/changes/`. A PR that changes what a
+published package ships (source, manifest, build config) or the Rush lockfile needs at least one:
+
+```bash
+npm run change
+```
+
+Rush asks for a bump type and a user-facing message per changed package. Use `none` for changes that need a record
+but no release. `rush change --verify` only sees files inside project folders, so `scripts/release-intent.ts`
+additionally requires a change file when `common/config/rush/pnpm-lock.yaml` changes. When `rush change` reports
+nothing to do, write one directly:
+
+```bash
+node scripts/release-intent.ts add --type patch --message "Update runtime dependencies."
+```
+
+Tests, fixtures and Markdown inside a package do not count as shipped files for `release-intent`, but
+`rush change --verify` still asks for a record; answer with `none`. Release and dependency bot PRs skip both checks
+in CI. See [`docs/development/release.md`](docs/development/release.md) for the release procedure.
 
 ## SDD Workflow And Document Lifecycle
 
@@ -172,7 +190,7 @@ Install local hooks after cloning or creating a repository from this template:
 ./scripts/install-git-hooks.sh
 ```
 
-The pre-commit hook runs `git diff --cached --check` and `./scripts/check-repository.sh` before a commit is created. Hooks are a local guardrail; CI and branch protection remain the authoritative enforcement because hooks can be missing or bypassed.
+The pre-commit hook runs `git diff --cached --check` and `./scripts/check-repository.sh` before a commit is created. The pre-push hook rejects pushes to `main`, which changes only through pull requests. Hooks are a local guardrail; CI and branch protection remain the authoritative enforcement because hooks can be missing or bypassed.
 
 If `core.hooksPath` is already set to another path, `scripts/install-git-hooks.sh` fails instead of overwriting it. Re-run with `--force` only after confirming the existing hooks can be replaced or moved into `.githooks`.
 
@@ -184,7 +202,7 @@ Template files do not carry GitHub branch protection settings into every new rep
 ./scripts/configure-github-repository.sh --repo OWNER/REPO --apply
 ```
 
-The setup script requires a GitHub account or token with permission to edit repository settings. It protects the default branch by requiring pull requests, one approving review, fresh reviews after new pushes, linear history, resolved conversations, and the `Review` workflow checks named `repository checks`, `conventional PR title`, and `PR description`.
+The setup script requires a GitHub account or token with permission to edit repository settings. It protects the default branch by requiring pull requests, one approving review, fresh reviews after new pushes, linear history, resolved conversations, the `CI` workflow's `check` job, and the `Review` workflow checks named `repository checks`, `conventional PR title`, and `PR description`.
 
 ## Security Reports
 

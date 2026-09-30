@@ -1,0 +1,48 @@
+name: Publish npm
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-npm-${{ github.event.release.tag_name }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: publish release set
+    if: github.event.release.prerelease == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      # npm Trusted Publishing exchanges the workflow's OIDC token for a publish credential.
+      id-token: write
+    env:
+      RELEASE_TAG: ${{ github.event.release.tag_name }}
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      # Provenance links each tarball to this workflow run; npm only accepts it from a public repository.
+      NPM_CONFIG_PROVENANCE: "true"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.release.tag_name }}
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .node-version
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      - run: node common/scripts/install-run-rush.js install
+      - name: Verify tag, versions and main ancestry
+        run: npm run release:check -- "$RELEASE_TAG" --repository "$GITHUB_REPOSITORY" --verify-git
+      - name: Run release gates
+        run: npm run check
+      - name: Publish packages with Rush
+        run: >-
+          node common/scripts/install-run-rush.js publish
+          --include-all --version-policy main --publish
+          --set-access-level public

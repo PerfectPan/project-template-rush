@@ -13,36 +13,51 @@ This repository is intended to become a maintainable, publishable project. Treat
 
 ## Project-Specific Commands
 
-Keep the generic review commands active, and replace the remaining placeholders after choosing the project stack:
+This is a Rush + pnpm TypeScript monorepo. Rush pins its own version and pnpm in `rush.json`; the root
+`package.json` only holds shortcuts that call `common/scripts/install-run-rush.js`, so `npm run <script>` works
+without a global Rush or pnpm install. Node comes from `.node-version`.
 
 ```bash
-# Install local Git hooks:
+# Install local Git hooks (pre-commit repository checks, pre-push blocks direct pushes to main):
 ./scripts/install-git-hooks.sh
 
-# Repository checks:
+# Install dependencies from the committed lockfile (CI does the same):
+node common/scripts/install-run-rush.js install
+
+# After adding or changing a dependency in any package.json:
+node common/scripts/install-run-rush.js update
+
+# Aggregate gate: format:check, build, lint, typecheck, test, check-repository:
+npm run check
+
+# Individual gates (Rush bulk commands run in every project):
+npm run format        # or format:check
+npm run build
+npm run lint          # oxlint with type-aware rules and TypeScript diagnostics
+npm run typecheck
+npm run test
+
+# Record a release note for changed packages, then verify one exists (CI runs the verify step on PRs):
+npm run change
+npm run change:verify
+
+# Release identity check and publish dry run (never add --publish locally):
+npm run release:check -- vX.Y.Z --repository OWNER/REPO
+npm run publish:dry-run
+
+# Repository, PR/MR title and description checks:
 ./scripts/check-repository.sh
-
-# PR/MR title check:
 ./scripts/check-pr-title.sh "docs: update project template"
-
-# PR/MR description check (file or stdin):
 ./scripts/check-pr-body.sh pr-body.md
 
 # GitHub repository setup dry run:
 ./scripts/configure-github-repository.sh --repo OWNER/REPO
-
-# Format:
-
-# Lint:
-
-# Test:
-
-# Build:
-
-# Package or release dry-run:
-
-# Security or package-specific hygiene scan:
 ```
+
+Rush projects are listed in `rush.json`. Publishable packages live under `packages/` and join the `main` version
+policy; `scripts/` is the private `repo-scripts` project for repository automation written in TypeScript and run
+directly by Node. Every project defines the `build`, `lint`, `typecheck`, `test`, `format` and `format:check`
+scripts that the Rush bulk commands call. `docs/development/release.md` is the release runbook.
 
 Do not claim implementation work is complete until the relevant commands pass, or until skipped commands are explained with concrete blockers.
 
@@ -58,6 +73,16 @@ For non-trivial changes:
 6. Run repository checks, title checks, and project-specific validation gates.
 7. For a newly created GitHub repository, configure branch protection with `scripts/configure-github-repository.sh --repo OWNER/REPO --apply` using an admin-authorized account.
 8. Open or update the PR/MR with motivation, implementation notes, exact validation, skipped gates, evidence, and risks.
+
+## Releases
+
+- A PR that changes a published package's source, manifest or build config, or the Rush lockfile, includes a Rush
+  change file under `common/changes/`. Create it with `npm run change`; when Rush reports nothing to do (for
+  example a lockfile-only change), use `node scripts/release-intent.ts add --type <major|minor|patch|none> --message "<text>"`.
+- Never bump versions, edit `CHANGELOG.json`/`CHANGELOG.md`, create release tags, or run `rush publish --publish`
+  by hand. The `Version Packages` workflow prepares versions, and publishing a GitHub Release runs `publish-npm.yml`.
+  Follow `docs/development/release.md`.
+- Workspace dependencies between packages use `workspace:*`; pnpm replaces them with exact versions when packing.
 
 ## Repository Architecture
 
@@ -112,6 +137,9 @@ Before pushing public-facing or package-facing changes, scan for accidental priv
 rg --hidden --no-ignore -n "private-token|secret|internal-domain.example|HOME_PATH_PLACEHOLDER" . \
   --glob '!.git/**' \
   --glob '!.omx/**' \
+  --glob '!**/node_modules/**' \
+  --glob '!common/temp/**' \
+  --glob '!**/dist/**' \
   --glob '!AGENTS.md' \
   --glob '!CONTRIBUTING.md' \
   --glob '!SECURITY.md'
