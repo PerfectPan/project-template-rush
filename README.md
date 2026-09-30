@@ -40,8 +40,11 @@ contribution workflow (Spec + Plan), review checks, Git hooks and documentation 
 4. **Protect the default branch** with an admin-authorized `gh` session:
 
    ```bash
-   ./scripts/configure-github-repository.sh --repo OWNER/REPO --apply
+   ./scripts/configure-github-repository.sh --repo OWNER/REPO --approvals 0 --check check --apply
    ```
+
+   `--check check` requires the CI job named `check` next to the review checks. `--approvals 0` suits a single
+   maintainer, who cannot approve their own pull requests; drop it to require one approving review.
 
    Also allow GitHub Actions to create pull requests (**Settings → Actions → General**) so Version Packages can open
    the release PR.
@@ -96,7 +99,6 @@ the PR/MR and issue templates, `.githooks/pre-commit`, `.github/workflows/review
 `scripts/`. Sync those from upstream instead of editing them here, then keep the Rush-specific additions:
 
 - the filled command sections in `AGENTS.md`, `CONTRIBUTING.md` and the PR/MR templates;
-- the `check` status check added to `scripts/configure-github-repository.sh`;
 - `.githooks/pre-push`, the Rush entries in `.gitignore`, and everything Rush, npm or TypeScript specific.
 
 Keep this template free of project-specific business logic; `packages/example` stays a minimal example.
