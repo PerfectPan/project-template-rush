@@ -13,7 +13,7 @@ contribution workflow (Spec + Plan), review checks, Git hooks and documentation 
 | --- | --- |
 | Monorepo | Rush 5.179.0, pnpm 10.34.6 (workspaces), pinned in `rush.json` |
 | Runtime | Node 24 LTS, pinned in `.node-version`; `engines` requires `^24.11.0` |
-| Language | TypeScript 6.0.3, `tsconfig` extends `@perfectpan/lint-config/tsconfig/node.json` |
+| Language | TypeScript 7.0.2, `tsconfig` extends `@perfectpan/lint-config/tsconfig/node.json` |
 | Lint and format | oxlint 1.86.0 + oxlint-tsgolint (type-aware), oxfmt 0.71.0, shared configs from [`@perfectpan/lint-config`](https://github.com/PerfectPan/lint-config) v0.1.0 |
 | Tests | Vitest 5 |
 | Releases | Rush change files, lockstep version policy `main`, npm Trusted Publishing with provenance |
