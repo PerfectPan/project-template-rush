@@ -116,7 +116,11 @@ and changes nothing.
   (`node scripts/release-intent.ts add --type patch --message "Update dependencies."`) when the update affects a
   published package's runtime dependencies, and push. `ensureConsistentVersions` fails if the PR bumped a tool in
   only some packages; bump the rest in the same branch.
-- **Dependabot GitHub Actions PRs** update pinned SHAs and version comments and need no extra steps.
+- **Dependabot GitHub Actions PRs** update pinned SHAs and version comments. Merge them for this repository's own
+  workflows (`ci.yml`, `version-packages.yml`, `publish-npm.yml`). Close PRs that touch `review.yml` or another file
+  synced from [PerfectPan/project-template](https://github.com/PerfectPan/project-template), with a comment that the
+  bump comes from upstream, and sync the file once upstream has it. Dependabot cannot ignore an action per file, so
+  these PRs keep appearing.
 
 ## Failure Recovery
 
