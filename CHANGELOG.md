@@ -7,8 +7,10 @@
 - Added CI running the aggregate `npm run check` gate plus Rush change-file and release-intent verification on PRs.
 - Added the npm release flow: a Version Packages workflow that opens a signed draft release PR, and a publish
   workflow that verifies the release identity and publishes with npm Trusted Publishing and provenance.
-- Added Dependabot for npm and GitHub Actions, a pre-push hook that blocks direct pushes to `main`, and the
-  `check` status check in the repository setup script.
+- Added Dependabot for npm and GitHub Actions, and a pre-push hook that blocks direct pushes to `main`.
+- Synced upstream `PerfectPan/project-template`: `configure-github-repository.sh` accepts `--approvals N` (use 0 for a
+  single maintainer) and repeatable `--check NAME`; the docs pass `--check check` to require this template's CI job.
+- Removed trailing blank lines that failed `git diff --cached --check` in repositories copying the template files.
 - Plans now pair technical decisions with a detailed execution plan: preconditions, completion contract, ordered tasks with exit conditions, validation ledger, and rollback per batch.
 - Added `scripts/check-pr-body.sh` and a `PR description` review job that require template sections, real Summary and Validation content, and no agent attribution lines.
 - PR title checks now reject CJK characters; bot-generated PRs must use conventional titles too.

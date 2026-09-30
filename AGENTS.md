@@ -71,7 +71,7 @@ For non-trivial changes:
 4. Update tests and documentation when behavior, public contracts, or workflow expectations change.
 5. Ensure local Git hooks are installed for the checkout when practical.
 6. Run repository checks, title checks, and project-specific validation gates.
-7. For a newly created GitHub repository, configure branch protection with `scripts/configure-github-repository.sh --repo OWNER/REPO --apply` using an admin-authorized account.
+7. For a newly created GitHub repository, configure branch protection with `scripts/configure-github-repository.sh --repo OWNER/REPO --check check --apply` (add `--approvals 0` for a single maintainer) using an admin-authorized account.
 8. Open or update the PR/MR with motivation, implementation notes, exact validation, skipped gates, evidence, and risks.
 
 ## Releases
