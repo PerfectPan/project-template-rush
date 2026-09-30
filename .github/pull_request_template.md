@@ -19,11 +19,9 @@ Allowed types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `buil
 - [ ] Repository checks: `./scripts/check-repository.sh`
 - [ ] PR title: `./scripts/check-pr-title.sh "<title>"`
 - [ ] PR description: `./scripts/check-pr-body.sh <body-file>`
-- [ ] Format:
-- [ ] Lint:
-- [ ] Test:
-- [ ] Build:
-- [ ] Package or release dry-run:
+- [ ] Aggregate gate (format, build, lint, typecheck, test, repository checks): `npm run check`
+- [ ] Change files for package changes: `npm run change:verify`
+- [ ] Package or release dry-run, when publishing changes: `npm run publish:dry-run`
 
 Skipped gates and reasons:
 

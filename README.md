@@ -1,56 +1,102 @@
-# Project Template
+# Project Template: Rush
 
-A technology-agnostic repository template for starting maintainable, publishable, AI-friendly projects.
+A repository template for TypeScript monorepos managed with [Rush](https://rushjs.io) and pnpm that publish
+packages to npm.
 
-Use this template when creating a new project that should have consistent contribution rules, agent instructions, review expectations, and repository hygiene from day one.
+It layers a Rush workspace, shared lint and format rules, CI, and an npm release flow on top of the stack-agnostic
+[PerfectPan/project-template](https://github.com/PerfectPan/project-template), and keeps that template's
+contribution workflow (Spec + Plan), review checks, Git hooks and documentation standards.
 
-## Start a New Project
+## Stack
 
-1. Create a new repository from this template.
-2. Replace this README with the new project's name, purpose, and quick start.
-3. Fill in the project-specific validation commands in `AGENTS.md` and `CONTRIBUTING.md`.
-4. Choose the actual implementation stack and add the source layout.
-5. Install local Git hooks:
+| Concern | Choice |
+| --- | --- |
+| Monorepo | Rush 5.179.0, pnpm 10.34.6 (workspaces), pinned in `rush.json` |
+| Runtime | Node 24 LTS, pinned in `.node-version`; `engines` requires `^24.11.0` |
+| Language | TypeScript 6.0.3, `tsconfig` extends `@perfectpan/lint-config/tsconfig/node.json` |
+| Lint and format | oxlint 1.86.0 + oxlint-tsgolint (type-aware), oxfmt 0.71.0, shared configs from [`@perfectpan/lint-config`](https://github.com/PerfectPan/lint-config) v0.1.0 |
+| Tests | Vitest 5 |
+| Releases | Rush change files, lockstep version policy `main`, npm Trusted Publishing with provenance |
+
+## Quick Start
+
+1. **Create the repository** from this template (GitHub **Use this template**, or
+   `gh repo create OWNER/REPO --public --template PerfectPan/project-template-rush --clone`).
+2. **Rename the placeholders.**
+   - Package scope and name: `@scope/example` in `rush.json`, `packages/example/package.json`, its README, and the
+     directory `common/changes/@scope/example/`. Rename or replace `packages/example` itself as needed.
+   - Repository URL: `PerfectPan/project-template-rush` in `rush.json` and every published `package.json`
+     `repository.url`. npm provenance requires it to match the publishing repository.
+   - Root `package.json` `name`, this README, `CHANGELOG.md`, and the `LICENSE` holder.
+   - Optionally the version policy name `main` (see [the release runbook](docs/development/release.md#version-policy)).
+3. **Install and check.**
 
    ```bash
    ./scripts/install-git-hooks.sh
+   node common/scripts/install-run-rush.js update   # refreshes the lockfile after renaming
+   npm run check
    ```
 
-6. Replace `.github/workflows/ci.yml.example` with a real `.github/workflows/ci.yml` for the project stack; the repository check accepts either file.
-7. Keep `.github/workflows/review.yml` enabled for generic review checks.
-8. Configure GitHub repository protection after the new repository is created:
+4. **Protect the default branch** with an admin-authorized `gh` session:
 
    ```bash
    ./scripts/configure-github-repository.sh --repo OWNER/REPO --apply
    ```
 
-9. Update `CHANGELOG.md` for the first release.
-10. Keep or replace `LICENSE` according to the project needs.
+   Also allow GitHub Actions to create pull requests (**Settings → Actions → General**) so Version Packages can open
+   the release PR.
+5. **Set up npm Trusted Publishing** for every package before the first release, following
+   [docs/development/release.md](docs/development/release.md#one-time-setup).
 
-## Included
+## Layout
 
-- `AGENTS.md` for agent workflow rules.
-- `CLAUDE.md` for Claude Code entrypoint instructions.
-- `CONTRIBUTING.md` for human contribution flow.
-- `SECURITY.md` for vulnerability and sensitive data reporting.
-- `docs/README.md` for architecture, development, operations, and reference documentation standards.
-- `.github/pull_request_template.md` for PR summaries and validation.
-- `.github/ISSUE_TEMPLATE/` for bug and feature reports.
-- `.github/workflows/review.yml` for generic repository, PR title, and PR description checks.
-- `.githooks/pre-commit` for local commit-time repository checks.
-- `.gitlab/merge_request_templates/default.md` for GitLab-style MR summaries.
-- `specs/0000-template.md` for active product behavior.
-- `docs/plans/0000-template.md` for active technical decisions and detailed execution plans.
-- `scripts/check-repository.sh` for local and CI repository checks.
-- `scripts/check-pr-title.sh` for conventional PR or MR title checks.
-- `scripts/check-pr-body.sh` for PR or MR description checks.
-- `scripts/lib/review-sections.sh` for the review template sections shared by the checks.
-- `scripts/install-git-hooks.sh` for installing local Git hooks.
-- `scripts/configure-github-repository.sh` for post-create GitHub branch protection setup.
-- `.editorconfig` for consistent text formatting.
+```text
+rush.json                     Rush projects and the Rush, pnpm and Node versions
+common/config/rush/           bulk commands, version policy, pnpm settings, lockfile
+common/changes/               pending Rush change files, consumed by Version Packages
+common/scripts/               install-run-rush.js and friends (managed by Rush; do not edit)
+packages/example/             example public library: src, Vitest test, tsc build to dist
+scripts/                      repo-scripts project (release-intent.ts, check-release.ts) and the template's shell checks
+.github/workflows/            ci.yml, review.yml, version-packages.yml, publish-npm.yml
+docs/development/release.md   release runbook
+```
+
+The root `package.json` is not a Rush project. Its scripts call `common/scripts/install-run-rush.js`, so
+`npm run check` works without a global Rush or pnpm.
+
+## Commands
+
+| Command | What it runs |
+| --- | --- |
+| `npm run check` | `format:check`, `build`, `lint`, `typecheck`, `test`, `scripts/check-repository.sh` |
+| `npm run build` / `lint` / `typecheck` / `test` / `format` / `format:check` | the Rush bulk command of the same name in every project |
+| `npm run change` | `rush change`: record a release note for changed packages |
+| `npm run change:verify` | `rush change --verify` plus `scripts/release-intent.ts check` against `origin/main` |
+| `npm run version-packages` | `rush version --bump --version-policy main`, then `rush update` |
+| `npm run release:check -- vX.Y.Z --repository OWNER/REPO` | tag, version, manifest and pending-change checks before publishing |
+| `npm run publish:dry-run` | `rush publish` without `--publish`: lists what would be published |
+
+## CI and Releases
+
+- `ci.yml` runs `npm run check` on pull requests and `main`, and on pull requests also requires Rush change files
+  for package changes.
+- `review.yml` (from the upstream template) checks repository hygiene, the PR title and the PR description.
+- `version-packages.yml` (manual) opens the draft PR `chore(release): version packages`.
+- `publish-npm.yml` publishes when a non-prerelease GitHub Release is published.
+- Dependabot updates npm dependencies and GitHub Actions weekly with `chore(deps)` titles.
+
+Third-party actions in the stack workflows are pinned to full commit SHAs. See
+[docs/development/release.md](docs/development/release.md) for the release procedure and recovery steps.
 
 ## Template Maintenance
 
-Keep this repository generic. Do not add language-specific package files, framework defaults, generated output, or project-specific business logic.
+Generic files come from [PerfectPan/project-template](https://github.com/PerfectPan/project-template): the policy
+sections of `AGENTS.md` and `CONTRIBUTING.md`, `CLAUDE.md`, `SECURITY.md`, `docs/README.md`, `specs/`, `docs/plans/`,
+the PR/MR and issue templates, `.githooks/pre-commit`, `.github/workflows/review.yml`, and the shell scripts under
+`scripts/`. Sync those from upstream instead of editing them here, then keep the Rush-specific additions:
 
-Keep collaboration policy in `AGENTS.md` and `CONTRIBUTING.md`, active behavior in `specs/`, active technical decisions and execution plans in `docs/plans/`, and current product or engineering knowledge in `docs/`.
+- the filled command sections in `AGENTS.md`, `CONTRIBUTING.md` and the PR/MR templates;
+- the `check` status check added to `scripts/configure-github-repository.sh`;
+- `.githooks/pre-push`, the Rush entries in `.gitignore`, and everything Rush, npm or TypeScript specific.
+
+Keep this template free of project-specific business logic; `packages/example` stays a minimal example.

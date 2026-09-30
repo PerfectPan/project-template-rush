@@ -1,0 +1,25 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/rush.schema.json",
+  "rushVersion": "5.179.0",
+  "pnpmVersion": "10.34.6",
+  "nodeSupportedVersionRange": "^24.11.0",
+  "ensureConsistentVersions": true,
+  "projectFolderMinDepth": 1,
+  "projectFolderMaxDepth": 2,
+  "repository": {
+    "url": "https://github.com/PerfectPan/project-template-rush.git",
+    "defaultBranch": "main"
+  },
+  "projects": [
+    {
+      "packageName": "@scope/example",
+      "projectFolder": "packages/example",
+      "versionPolicyName": "main"
+    },
+    {
+      "packageName": "repo-scripts",
+      "projectFolder": "scripts",
+      "shouldPublish": false
+    }
+  ]
+}
