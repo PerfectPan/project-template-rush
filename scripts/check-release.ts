@@ -58,7 +58,9 @@ try {
     .filter((path) => path.endsWith(".json"))
     .sort();
 } catch (error) {
-  if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+  if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
+    throw error;
+  }
 }
 
 const errors = releaseErrors({ tag, repository, policy, packages, pendingChangeFiles });
@@ -67,11 +69,15 @@ if (values["verify-git"] === true) {
   const head = git("rev-parse", "HEAD");
   try {
     const tagged = git("rev-parse", `refs/tags/${tag}^{commit}`);
-    if (tagged !== head) errors.push(`HEAD ${head} is not the commit tagged ${tag} (${tagged})`);
+    if (tagged !== head) {
+      errors.push(`HEAD ${head} is not the commit tagged ${tag} (${tagged})`);
+    }
   } catch {
     errors.push(`tag ${tag} does not exist locally`);
   }
-  if (git("status", "--porcelain") !== "") errors.push("worktree must be clean");
+  if (git("status", "--porcelain") !== "") {
+    errors.push("worktree must be clean");
+  }
   try {
     git("merge-base", "--is-ancestor", "HEAD", "origin/main");
   } catch {
@@ -80,7 +86,9 @@ if (values["verify-git"] === true) {
 }
 
 if (errors.length > 0) {
-  for (const error of errors) console.error(`check-release: ${error}`);
+  for (const error of errors) {
+    console.error(`check-release: ${error}`);
+  }
   process.exit(1);
 }
 const names = packages.map(({ project }) => project.packageName).join(", ");

@@ -51,9 +51,13 @@ export function isPublished(project: RushProject): boolean {
  * `rush change --verify` only looks inside project folders, so the lockfile rule is what this adds.
  */
 export function isShippedChange(path: string, projects: RushProject[]): boolean {
-  if (path === LOCKFILE) return true;
+  if (path === LOCKFILE) {
+    return true;
+  }
   const project = projects.find((candidate) => path.startsWith(`${candidate.projectFolder}/`));
-  if (project === undefined || !isPublished(project)) return false;
+  if (project === undefined || !isPublished(project)) {
+    return false;
+  }
   return !/\.test\.[cm]?[jt]sx?$/.test(path) && !/(^|\/)(fixtures|__tests__)\//.test(path) && !path.endsWith(".md");
 }
 
@@ -85,28 +89,39 @@ export interface ReleaseInput {
 /** Returns every reason the release cannot be published; an empty list means the release set is valid. */
 export function releaseErrors({ tag, repository, policy, packages, pendingChangeFiles }: ReleaseInput): string[] {
   const errors: string[] = [];
-  if (!/^[^/\s]+\/[^/\s]+$/.test(repository)) errors.push(`repository must be owner/name, got "${repository}"`);
-  if (packages.length === 0) errors.push(`version policy ${policy.policyName} has no projects`);
+  if (!/^[^/\s]+\/[^/\s]+$/.test(repository)) {
+    errors.push(`repository must be owner/name, got "${repository}"`);
+  }
+  if (packages.length === 0) {
+    errors.push(`version policy ${policy.policyName} has no projects`);
+  }
 
   if (policy.definitionName === "lockStepVersion") {
     const version = policy.version ?? "";
     if (!/^\d+\.\d+\.\d+$/.test(version)) {
       errors.push(`policy ${policy.policyName} version must be a stable x.y.z release, got "${version}"`);
     }
-    if (tag !== `v${version}`)
+    if (tag !== `v${version}`) {
       errors.push(`release tag ${tag ?? "(missing)"} does not match policy version v${version}`);
+    }
   } else if (tag === undefined || tag.length === 0) {
     errors.push("release tag is required");
   }
 
   for (const { project, manifest } of packages) {
     const name = project.packageName;
-    if (manifest.name !== name) errors.push(`${project.projectFolder}/package.json name must be ${name}`);
-    if (manifest.private === true) errors.push(`${name} is private but belongs to a version policy`);
+    if (manifest.name !== name) {
+      errors.push(`${project.projectFolder}/package.json name must be ${name}`);
+    }
+    if (manifest.private === true) {
+      errors.push(`${name} is private but belongs to a version policy`);
+    }
     if (policy.definitionName === "lockStepVersion" && manifest.version !== policy.version) {
       errors.push(`${name} version ${manifest.version ?? "(missing)"} does not match policy version ${policy.version}`);
     }
-    if (manifest.publishConfig?.access !== "public") errors.push(`${name} publishConfig.access must be "public"`);
+    if (manifest.publishConfig?.access !== "public") {
+      errors.push(`${name} publishConfig.access must be "public"`);
+    }
     if (!Array.isArray(manifest.files) || manifest.files.length === 0) {
       errors.push(`${name} must list published files in "files"`);
     }
