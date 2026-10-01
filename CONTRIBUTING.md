@@ -36,7 +36,7 @@ identical across packages.
 5. Identify the affected domain concepts, layer boundaries, data flow, and tests before changing code.
 6. Implement the change, keeping responsibilities separated and using existing project patterns.
 7. Add or update tests for behavior changes.
-8. Update `README.md`, `CHANGELOG.md`, `docs/`, `AGENTS.md`, `CONTRIBUTING.md`, or the active Spec and Plan when user-facing behavior, architecture, development workflow, operations, or project policy changes.
+8. Update `README.md`, `docs/`, `AGENTS.md`, `CONTRIBUTING.md`, or the active Spec and Plan when user-facing behavior, architecture, development workflow, operations, or project policy changes.
 9. Run repository checks, title checks, and project-specific format, lint, test, build, and package checks.
 10. For a newly created GitHub repository, run the repository setup script with an admin-authorized account.
 11. Open a pull request or merge request with a conventional title, motivation, implementation notes, validation, evidence, skipped gates, and follow-up risks.
@@ -173,6 +173,14 @@ Titles are English; `scripts/check-pr-title.sh` rejects CJK characters. Bot-gene
 The description keeps every `##` section from the PR/MR template. Summary and Validation must contain real content, not template placeholders. Do not include agent attribution lines such as "Generated with <tool>"; the author is accountable for the content. `scripts/check-pr-body.sh` enforces these rules, and the `PR description` job runs it on every pull request event, including description edits. PRs opened by bot accounts skip the description check, because dependency and release bots write their own bodies; they still must pass the title check. A skipped job still satisfies the required status check.
 
 Update the description when review feedback, rebases, or follow-up commits change the scope or validation result. Reviewers should be able to understand the final state from the PR/MR without reconstructing it from comments.
+
+## Release Notes
+
+Release notes come from the release tool. Rush writes each published package's `CHANGELOG.md` from the change files in `common/changes/` (see [Change Files](#change-files)). Do not edit generated changelogs or keep a hand-written root `CHANGELOG.md` beside them.
+
+## License
+
+The project is licensed under GPL-3.0-only (`LICENSE`). Distributing the software or a modified version requires releasing its source under the same license. Package metadata uses the SPDX identifier `GPL-3.0-only`. Change the license only as a deliberate project decision, and keep third-party notices for code or data copied from other projects.
 
 ## Repository Checks
 

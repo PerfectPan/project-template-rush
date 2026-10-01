@@ -27,7 +27,8 @@ contribution workflow (Spec + Plan), review checks, Git hooks and documentation 
      directory `common/changes/@scope/example/`. Rename or replace `packages/example` itself as needed.
    - Repository URL: `PerfectPan/project-template-rush` in `rush.json` and every published `package.json`
      `repository.url`. npm provenance requires it to match the publishing repository.
-   - Root `package.json` `name`, this README, `CHANGELOG.md`, and the `LICENSE` holder.
+   - Root `package.json` `name` and this README. `LICENSE` is GPL-3.0-only with no holder line; package metadata says
+     `GPL-3.0-only`.
    - Optionally the version policy name `main` (see [the release runbook](docs/development/release.md#version-policy)).
 3. **Install and check.**
 
@@ -90,6 +91,10 @@ The root `package.json` is not a Rush project. Its scripts call `common/scripts/
 
 Workflows reference actions by their latest major version tag, such as `actions/checkout@v7`, not by commit SHA. See
 [docs/development/release.md](docs/development/release.md) for the release procedure and recovery steps.
+
+## License
+
+GPL-3.0-only. See [LICENSE](LICENSE).
 
 ## Template Maintenance
 
