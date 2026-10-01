@@ -16,9 +16,9 @@ Allowed types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `buil
 
 ## Validation
 
-- [ ] Repository checks: `./scripts/check-repository.sh`
-- [ ] PR title: `./scripts/check-pr-title.sh "<title>"`
-- [ ] PR description: `./scripts/check-pr-body.sh <body-file>`
+- [ ] Repository checks: `gh repo-checks repository`
+- [ ] PR title: `gh repo-checks pr-title "<title>"`
+- [ ] PR description: `gh repo-checks pr-body <body-file>`
 - [ ] Aggregate gate (format, build, lint, typecheck, test, repository checks): `npm run check`
 - [ ] Change files for package changes: `npm run change:verify`
 - [ ] Package or release dry-run, when publishing changes: `npm run publish:dry-run`

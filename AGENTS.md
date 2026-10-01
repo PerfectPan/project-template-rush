@@ -27,7 +27,7 @@ node common/scripts/install-run-rush.js install
 # After adding or changing a dependency in any package.json:
 node common/scripts/install-run-rush.js update
 
-# Aggregate gate: format:check, build, lint, typecheck, test, check-repository:
+# Aggregate gate: format:check, build, lint, typecheck, test:
 npm run check
 
 # Individual gates (Rush bulk commands run in every project):
@@ -46,12 +46,12 @@ npm run release:check -- vX.Y.Z --repository OWNER/REPO
 npm run publish:dry-run
 
 # Repository, PR/MR title and description checks:
-./scripts/check-repository.sh
-./scripts/check-pr-title.sh "docs: update project template"
-./scripts/check-pr-body.sh pr-body.md
+gh repo-checks repository
+gh repo-checks pr-title "docs: update project template"
+gh repo-checks pr-body pr-body.md
 
 # GitHub repository setup dry run:
-./scripts/configure-github-repository.sh --repo OWNER/REPO
+gh repo-checks protect --repo OWNER/REPO
 ```
 
 Rush projects are listed in `rush.json`. Publishable packages live under `packages/` and join the `main` version
@@ -71,7 +71,7 @@ For non-trivial changes:
 4. Update tests and documentation when behavior, public contracts, or workflow expectations change.
 5. Ensure local Git hooks are installed for the checkout when practical.
 6. Run repository checks, title checks, and project-specific validation gates.
-7. For a newly created GitHub repository, configure branch protection with `scripts/configure-github-repository.sh --repo OWNER/REPO --check check --apply` (add `--approvals 0` for a single maintainer) using an admin-authorized account.
+7. For a newly created GitHub repository, configure branch protection with `gh repo-checks protect --repo OWNER/REPO --check check --apply` (add `--approvals 0` for a single maintainer) using an admin-authorized account.
 8. Open or update the PR/MR with motivation, implementation notes, exact validation, skipped gates, evidence, and risks.
 
 ## Releases
@@ -116,8 +116,8 @@ When an AI agent completes implementation work:
 
 ## Review Evidence
 
-- PR/MR titles must be English and follow `type(scope): summary`, including bot-generated release and dependency PRs such as `chore(release): version packages`; use `scripts/check-pr-title.sh` to verify them.
-- PR/MR descriptions must keep every template section and include motivation, implementation notes, exact validation commands, skipped gates with reasons, and follow-up risks. Do not add agent attribution lines such as "Generated with <tool>". Verify the body with `scripts/check-pr-body.sh` before opening or updating the PR/MR. Bot-opened PRs are exempt from the description check, not the title check.
+- PR/MR titles must be English and follow `type(scope): summary`, including bot-generated release and dependency PRs such as `chore(release): version packages`; use `gh repo-checks pr-title` to verify them.
+- PR/MR descriptions must keep every template section and include motivation, implementation notes, exact validation commands, skipped gates with reasons, and follow-up risks. Do not add agent attribution lines such as "Generated with <tool>". Verify the body with `gh repo-checks pr-body` before opening or updating the PR/MR. Bot-opened PRs are exempt from the description check, not the title check.
 - If a claim depends on logs, screenshots, package output, deployed behavior, or generated artifacts, attach or link the evidence in the PR/MR.
 - Update the PR/MR description after substantial code changes, review-driven revisions, rebases that change behavior, or validation reruns.
 - Keep GitHub PR and GitLab MR templates in sync if the project uses both hosting styles.

@@ -38,7 +38,7 @@ identical across packages.
 7. Add or update tests for behavior changes.
 8. Update `README.md`, `docs/`, `AGENTS.md`, `CONTRIBUTING.md`, or the active Spec and Plan when user-facing behavior, architecture, development workflow, operations, or project policy changes.
 9. Run repository checks, title checks, and project-specific format, lint, test, build, and package checks.
-10. For a newly created GitHub repository, run the repository setup script with an admin-authorized account.
+10. For a newly created GitHub repository, run `gh repo-checks protect --apply` with an admin-authorized account.
 11. Open a pull request or merge request with a conventional title, motivation, implementation notes, validation, evidence, skipped gates, and follow-up risks.
 12. Keep the PR/MR description current after review feedback, rebases, validation reruns, or scope changes.
 
@@ -57,13 +57,13 @@ npm run check
 npm run change:verify
 
 # PR/MR title:
-./scripts/check-pr-title.sh "docs: update project template"
+gh repo-checks pr-title "docs: update project template"
 
 # PR/MR description:
-./scripts/check-pr-body.sh pr-body.md
+gh repo-checks pr-body pr-body.md
 
 # GitHub repository setup dry run:
-./scripts/configure-github-repository.sh --repo OWNER/REPO
+gh repo-checks protect --repo OWNER/REPO
 
 # Package or release dry-run:
 npm run publish:dry-run
@@ -168,9 +168,9 @@ type(scope): summary
 
 Allowed types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`.
 
-Titles are English; `scripts/check-pr-title.sh` rejects CJK characters. Bot-generated PRs follow the same rule, so configure release and dependency bots to emit titles such as `chore(release): version packages` or `chore(deps): bump <package> to <version>`.
+Titles are English; `gh repo-checks pr-title` rejects CJK characters. Bot-generated PRs follow the same rule, so configure release and dependency bots to emit titles such as `chore(release): version packages` or `chore(deps): bump <package> to <version>`.
 
-The description keeps every `##` section from the PR/MR template. Summary and Validation must contain real content, not template placeholders. Do not include agent attribution lines such as "Generated with <tool>"; the author is accountable for the content. `scripts/check-pr-body.sh` enforces these rules, and the `PR description` job runs it on every pull request event, including description edits. PRs opened by bot accounts skip the description check, because dependency and release bots write their own bodies; they still must pass the title check. A skipped job still satisfies the required status check.
+The description keeps every `##` section from the PR/MR template. Summary and Validation must contain real content, not template placeholders. Do not include agent attribution lines such as "Generated with <tool>"; the author is accountable for the content. `gh repo-checks pr-body` enforces these rules, and the `PR description` job runs it on every pull request event, including description edits. PRs opened by bot accounts skip the description check, because dependency and release bots write their own bodies; they still must pass the title check. A skipped job still satisfies the required status check.
 
 Update the description when review feedback, rebases, or follow-up commits change the scope or validation result. Reviewers should be able to understand the final state from the PR/MR without reconstructing it from comments.
 
@@ -193,7 +193,9 @@ Do not commit private tokens, local config, generated workspaces, internal hostn
 
 Keep package or deploy contents intentional. If a file should ship, verify it appears in the package or deployment dry-run.
 
-Run `./scripts/check-repository.sh` locally before opening review. This generic check does not replace stack-specific tests, but it catches missing template files, tracked local artifacts, obvious secrets, private paths, and drift in review templates.
+The review checks come from [`PerfectPan/gh-repo-checks`](https://github.com/PerfectPan/gh-repo-checks): CI runs them through its GitHub Action (`uses: PerfectPan/gh-repo-checks@v1`), and locally they run as a GitHub CLI extension (`gh extension install PerfectPan/gh-repo-checks`). Do not copy the check scripts into this repository; change them upstream. Repository-specific additions, such as extra required files or forbidden patterns, go in `.github/repo-checks.conf`, and repository-specific scripts run as extra steps after the shared check.
+
+Run `gh repo-checks repository` locally before opening review. This generic check does not replace stack-specific tests, but it catches missing template files, tracked local artifacts, obvious secrets, private paths, and drift in review templates.
 
 Workflows reference actions by their latest major version tag, such as `actions/checkout@v7`, not by commit SHA. Workflow files copied from this template take action upgrades from the template rather than local edits.
 
@@ -205,7 +207,7 @@ Install local hooks after cloning or creating a repository from this template:
 ./scripts/install-git-hooks.sh
 ```
 
-The pre-commit hook runs `git diff --cached --check` and `./scripts/check-repository.sh` before a commit is created. The pre-push hook rejects pushes to `main`, which changes only through pull requests. Hooks are a local guardrail; CI and branch protection remain the authoritative enforcement because hooks can be missing or bypassed.
+The pre-commit hook runs `git diff --cached --check` and `gh repo-checks repository --staged` before a commit is created; without the extension it warns and skips the repository check. The pre-push hook rejects pushes to `main`, which changes only through pull requests. Hooks are a local guardrail; CI and branch protection remain the authoritative enforcement because hooks can be missing or bypassed.
 
 If `core.hooksPath` is already set to another path, `scripts/install-git-hooks.sh` fails instead of overwriting it. Re-run with `--force` only after confirming the existing hooks can be replaced or moved into `.githooks`.
 
@@ -214,10 +216,10 @@ If `core.hooksPath` is already set to another path, `scripts/install-git-hooks.s
 Template files do not carry GitHub branch protection settings into every new repository. After creating a GitHub repository from this template, run:
 
 ```bash
-./scripts/configure-github-repository.sh --repo OWNER/REPO --check check --apply
+gh repo-checks protect --repo OWNER/REPO --check check --apply
 ```
 
-The setup script requires a GitHub account or token with permission to edit repository settings. It protects the default branch by requiring pull requests, one approving review (fresh after new pushes), linear history, resolved conversations, and the `Review` workflow checks named `repository checks`, `conventional PR title`, and `PR description`. `--check check` also requires this repository's `CI` workflow job named `check`.
+The command requires a GitHub account or token with permission to edit repository settings. It protects the default branch by requiring pull requests, one approving review (fresh after new pushes), linear history, resolved conversations, and the `Review` workflow checks named `repository checks`, `conventional PR title`, and `PR description`. `--check check` also requires this repository's `CI` workflow job named `check`.
 
 A repository with a single maintainer cannot approve its own pull requests; pass `--approvals 0` to keep the other protections without a review requirement. Add the project's CI job names with `--check NAME` (repeatable) so they are required too. If the repository already uses a ruleset, add these checks to the ruleset instead of layering classic branch protection on top.
 

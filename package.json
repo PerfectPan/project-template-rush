@@ -11,7 +11,7 @@
     "format:check": "node common/scripts/install-run-rush.js format:check",
     "change": "node common/scripts/install-run-rush.js change",
     "change:verify": "node common/scripts/install-run-rush.js change --verify && node scripts/release-intent.ts check",
-    "check": "npm run format:check && npm run build && npm run lint && npm run typecheck && npm run test && ./scripts/check-repository.sh",
+    "check": "npm run format:check && npm run build && npm run lint && npm run typecheck && npm run test",
     "version-packages": "node common/scripts/install-run-rush.js version --bump --version-policy main && node common/scripts/install-run-rush.js update",
     "release:check": "node scripts/check-release.ts",
     "publish:dry-run": "node common/scripts/install-run-rush.js publish --include-all --version-policy main --set-access-level public"

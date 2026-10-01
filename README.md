@@ -33,6 +33,7 @@ contribution workflow (Spec + Plan), review checks, Git hooks and documentation 
 3. **Install and check.**
 
    ```bash
+   gh extension install PerfectPan/gh-repo-checks
    ./scripts/install-git-hooks.sh
    node common/scripts/install-run-rush.js update   # refreshes the lockfile after renaming
    npm run check
@@ -41,7 +42,7 @@ contribution workflow (Spec + Plan), review checks, Git hooks and documentation 
 4. **Protect the default branch** with an admin-authorized `gh` session:
 
    ```bash
-   ./scripts/configure-github-repository.sh --repo OWNER/REPO --approvals 0 --check check --apply
+   gh repo-checks protect --repo OWNER/REPO --approvals 0 --check check --apply
    ```
 
    `--check check` requires the CI job named `check` next to the review checks. `--approvals 0` suits a single
@@ -72,7 +73,7 @@ The root `package.json` is not a Rush project. Its scripts call `common/scripts/
 
 | Command | What it runs |
 | --- | --- |
-| `npm run check` | `format:check`, `build`, `lint`, `typecheck`, `test`, `scripts/check-repository.sh` |
+| `npm run check` | `format:check`, `build`, `lint`, `typecheck`, `test` (repository checks run in the Review workflow and the pre-commit hook) |
 | `npm run build` / `lint` / `typecheck` / `test` / `format` / `format:check` | the Rush bulk command of the same name in every project |
 | `npm run change` | `rush change`: record a release note for changed packages |
 | `npm run change:verify` | `rush change --verify` plus `scripts/release-intent.ts check` against `origin/main` |

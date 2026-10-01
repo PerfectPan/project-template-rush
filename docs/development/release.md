@@ -110,7 +110,7 @@ and changes nothing.
 
 ## Bot Pull Requests
 
-- **Release PR**: see step 3 above. Its title already passes `check-pr-title.sh`; bot PRs skip the description check.
+- **Release PR**: see step 3 above. Its title already passes `gh repo-checks pr-title`; bot PRs skip the description check.
 - **Dependabot npm PRs** edit `package.json` files but not the Rush lockfile, so `rush install` fails in CI. Check
   out the branch, run `node common/scripts/install-run-rush.js update`, commit the lockfile, add a change file
   (`node scripts/release-intent.ts add --type patch --message "Update dependencies."`) when the update affects a
