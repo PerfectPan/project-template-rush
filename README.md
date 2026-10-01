@@ -100,7 +100,7 @@ MIT. See [LICENSE](LICENSE). Projects created from this template choose their ow
 ## Template Maintenance
 
 Generic files come from [PerfectPan/project-template](https://github.com/PerfectPan/project-template): the policy
-sections of `AGENTS.md` and `CONTRIBUTING.md`, `CLAUDE.md`, `SECURITY.md`, `docs/README.md`, `docs/specs/`,
+sections of `AGENTS.md` and `CONTRIBUTING.md`, `SECURITY.md`, `docs/README.md`, `docs/specs/`,
 `docs/plans/`, the PR/MR and issue templates, `.githooks/pre-commit`, `.github/workflows/review.yml`, and the shell
 scripts under `scripts/`. Sync those from upstream instead of editing them here, then keep the Rush-specific additions:
 
