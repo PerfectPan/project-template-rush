@@ -2,8 +2,10 @@
 
 ## Development Setup
 
-Requirements: the Node.js version in `.node-version` (Node 24 LTS) and Git. Rush and pnpm are downloaded on demand
+Requirements: the Node.js major in `.node-version` (Node 24, the current LTS) and Git. Rush and pnpm are downloaded on demand
 at the versions pinned in `rush.json`; a global install is optional.
+
+CI and `.node-version` follow the current Node.js Active LTS major, and workflows reference actions by their latest major tag. When a new Node.js line enters Active LTS (Node 26 is expected in late October 2026), move `.node-version`, `nodeSupportedVersionRange` in `rush.json`, the `engines` fields and `@types/node` to it in one change.
 
 ```bash
 # install local Git hooks
