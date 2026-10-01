@@ -15,6 +15,7 @@ CI and `.node-version` follow the current Node.js Active LTS major, and workflow
 node common/scripts/install-run-rush.js install
 
 # after changing dependencies in any package.json, refresh the lockfile and commit it
+# (pnpm rejects versions published less than a day ago: minimumReleaseAgeMinutes in common/config/rush/pnpm-config.json)
 node common/scripts/install-run-rush.js update
 
 # run the full local gate

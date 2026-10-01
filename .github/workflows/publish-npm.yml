@@ -23,9 +23,6 @@ jobs:
       id-token: write
     env:
       RELEASE_TAG: ${{ github.event.release.tag_name }}
-      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
-      # Provenance links each tarball to this workflow run; npm only accepts it from a public repository.
-      NPM_CONFIG_PROVENANCE: "true"
     steps:
       - uses: actions/checkout@v7
         with:
@@ -42,6 +39,8 @@ jobs:
       - name: Run release gates
         run: npm run check
       - name: Publish packages with Rush
+        # Rush runs `pnpm publish`, which ignores NPM_CONFIG_* variables. pnpm attaches provenance on its own after
+        # the OIDC exchange when both the repository and the package are public, and skips it otherwise.
         run: >-
           node common/scripts/install-run-rush.js publish
           --include-all --version-policy main --publish

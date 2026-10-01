@@ -37,8 +37,8 @@ a tag scheme (for example `release-2026-10-01`) and document it here. To rename 
 
 ### Repository
 
-1. Keep the repository public. npm provenance is only accepted from public repositories; for a private repository,
-   remove `NPM_CONFIG_PROVENANCE` from `publish-npm.yml`.
+1. Keep the repository public. pnpm attaches provenance only when the repository and the package are public; from a
+   private repository it publishes without provenance.
 2. Every published `package.json` has `repository.url` pointing at this GitHub repository (`git+https://github.com/OWNER/REPO.git`)
    and `publishConfig.access: "public"`. npm rejects provenance when the repository does not match, and
    `npm run release:check` enforces both.
