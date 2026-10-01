@@ -2,7 +2,7 @@
   "name": "@scope/example",
   "version": "0.0.0",
   "description": "Example library published from this Rush monorepo.",
-  "license": "GPL-3.0-only",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/PerfectPan/project-template-rush.git",
