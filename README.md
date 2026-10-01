@@ -88,15 +88,15 @@ The root `package.json` is not a Rush project. Its scripts call `common/scripts/
 - `publish-npm.yml` publishes when a non-prerelease GitHub Release is published.
 - Dependabot updates npm dependencies and GitHub Actions weekly with `chore(deps)` titles.
 
-Third-party actions in the stack workflows are pinned to full commit SHAs. See
+Workflows reference actions by their latest major version tag, such as `actions/checkout@v7`, not by commit SHA. See
 [docs/development/release.md](docs/development/release.md) for the release procedure and recovery steps.
 
 ## Template Maintenance
 
 Generic files come from [PerfectPan/project-template](https://github.com/PerfectPan/project-template): the policy
-sections of `AGENTS.md` and `CONTRIBUTING.md`, `CLAUDE.md`, `SECURITY.md`, `docs/README.md`, `specs/`, `docs/plans/`,
-the PR/MR and issue templates, `.githooks/pre-commit`, `.github/workflows/review.yml`, and the shell scripts under
-`scripts/`. Sync those from upstream instead of editing them here, then keep the Rush-specific additions:
+sections of `AGENTS.md` and `CONTRIBUTING.md`, `CLAUDE.md`, `SECURITY.md`, `docs/README.md`, `docs/specs/`,
+`docs/plans/`, the PR/MR and issue templates, `.githooks/pre-commit`, `.github/workflows/review.yml`, and the shell
+scripts under `scripts/`. Sync those from upstream instead of editing them here, then keep the Rush-specific additions:
 
 - the filled command sections in `AGENTS.md`, `CONTRIBUTING.md` and the PR/MR templates;
 - `.githooks/pre-push`, the Rush entries in `.gitignore`, and everything Rush, npm or TypeScript specific.
