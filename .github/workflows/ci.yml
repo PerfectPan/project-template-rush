@@ -26,14 +26,15 @@ jobs:
         with:
           node-version-file: .node-version
       - name: Cache dependency downloads
-        # Rush's pnpm store and the npm cache install-run-rush uses for Rush itself.
+        # Rush's pnpm store and the npm cache install-run-rush uses for Rush itself. The prefix names the
+        # pnpm store layout (v11 since pnpm 11), so a store from an older pnpm is never restored and carried along.
         uses: actions/cache@v6
         with:
           path: |
             common/temp/pnpm-store
             ~/.npm/_cacache
-          key: ${{ runner.os }}-dependency-downloads-${{ hashFiles('rush.json', 'common/config/rush/pnpm-lock.yaml', 'common/config/rush/pnpm-config.json') }}
-          restore-keys: ${{ runner.os }}-dependency-downloads-
+          key: ${{ runner.os }}-pnpm-store-v11-dependency-downloads-${{ hashFiles('rush.json', 'common/config/rush/pnpm-lock.yaml', 'common/config/rush/pnpm-config.json') }}
+          restore-keys: ${{ runner.os }}-pnpm-store-v11-dependency-downloads-
       - run: node common/scripts/install-run-rush.js install
       - run: npm run check
       - name: Require change files for package changes
