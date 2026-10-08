@@ -13,8 +13,8 @@ importers:
   ../../packages/example:
     devDependencies:
       '@perfectpan/lint-config':
-        specifier: github:PerfectPan/lint-config#v0.3.2
-        version: https://codeload.github.com/PerfectPan/lint-config/tar.gz/3edb87346c2461e45cd30ca601fbb4636777a541(oxfmt@0.71.0)(oxlint-tsgolint@7.0.2003)(oxlint@1.86.0(oxlint-tsgolint@7.0.2003))(typescript@7.0.2)
+        specifier: github:PerfectPan/lint-config#v0.4.0
+        version: https://codeload.github.com/PerfectPan/lint-config/tar.gz/53c0ef5b06ad6022643be96d7fa4cb7e01ce7ee3(oxfmt@0.71.0)(oxlint-tsgolint@7.0.2003)(oxlint@1.86.0(oxlint-tsgolint@7.0.2003))(typescript@7.0.2)
       '@types/node':
         specifier: 24.19.0
         version: 24.19.0
@@ -37,8 +37,8 @@ importers:
   ../../scripts:
     devDependencies:
       '@perfectpan/lint-config':
-        specifier: github:PerfectPan/lint-config#v0.3.2
-        version: https://codeload.github.com/PerfectPan/lint-config/tar.gz/3edb87346c2461e45cd30ca601fbb4636777a541(oxfmt@0.71.0)(oxlint-tsgolint@7.0.2003)(oxlint@1.86.0(oxlint-tsgolint@7.0.2003))(typescript@7.0.2)
+        specifier: github:PerfectPan/lint-config#v0.4.0
+        version: https://codeload.github.com/PerfectPan/lint-config/tar.gz/53c0ef5b06ad6022643be96d7fa4cb7e01ce7ee3(oxfmt@0.71.0)(oxlint-tsgolint@7.0.2003)(oxlint@1.86.0(oxlint-tsgolint@7.0.2003))(typescript@7.0.2)
       '@types/node':
         specifier: 24.19.0
         version: 24.19.0
@@ -347,9 +347,9 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@perfectpan/lint-config@https://codeload.github.com/PerfectPan/lint-config/tar.gz/3edb87346c2461e45cd30ca601fbb4636777a541':
-    resolution: {gitHosted: true, integrity: sha512-HlCTglF1Zcfw/pmIHekrMFiN1z/4I+BN9V726ai5BGZq61Mvvd2EebPaxdPK2SWt7jsH0NQTMZwNxsEHaginFw==, tarball: https://codeload.github.com/PerfectPan/lint-config/tar.gz/3edb87346c2461e45cd30ca601fbb4636777a541}
-    version: 0.3.2
+  '@perfectpan/lint-config@https://codeload.github.com/PerfectPan/lint-config/tar.gz/53c0ef5b06ad6022643be96d7fa4cb7e01ce7ee3':
+    resolution: {gitHosted: true, integrity: sha512-7dXoaDOZotSx+5w9++i0q38o/u5OU8boOFxUzpoPOz+1bMTegDhgw+886QAKobVWn47nG3BHPPhdE323cIN3VA==, tarball: https://codeload.github.com/PerfectPan/lint-config/tar.gz/53c0ef5b06ad6022643be96d7fa4cb7e01ce7ee3}
+    version: 0.4.0
     peerDependencies:
       oxfmt: '>=0.57.0'
       oxlint: '>=1.79.0'
@@ -1046,7 +1046,7 @@ snapshots:
   '@oxlint/binding-win32-x64-msvc@1.86.0':
     optional: true
 
-  '@perfectpan/lint-config@https://codeload.github.com/PerfectPan/lint-config/tar.gz/3edb87346c2461e45cd30ca601fbb4636777a541(oxfmt@0.71.0)(oxlint-tsgolint@7.0.2003)(oxlint@1.86.0(oxlint-tsgolint@7.0.2003))(typescript@7.0.2)':
+  '@perfectpan/lint-config@https://codeload.github.com/PerfectPan/lint-config/tar.gz/53c0ef5b06ad6022643be96d7fa4cb7e01ce7ee3(oxfmt@0.71.0)(oxlint-tsgolint@7.0.2003)(oxlint@1.86.0(oxlint-tsgolint@7.0.2003))(typescript@7.0.2)':
     optionalDependencies:
       oxfmt: 0.71.0
       oxlint: 1.86.0(oxlint-tsgolint@7.0.2003)
