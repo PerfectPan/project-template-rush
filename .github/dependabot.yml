@@ -15,11 +15,8 @@ updates:
     groups:
       toolchain:
         patterns:
-          - "oxfmt"
-          - "oxlint"
-          - "oxlint-tsgolint"
+          - "vite-plus"
           - "typescript"
-          - "vitest"
           - "@types/node"
     ignore:
       # Runtime types follow the Node LTS major pinned in .node-version.
