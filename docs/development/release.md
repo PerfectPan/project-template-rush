@@ -115,7 +115,9 @@ and changes nothing.
   out the branch, run `node common/scripts/install-run-rush.js update`, commit the lockfile, add a change file
   (`node scripts/release-intent.ts add --type patch --message "Update dependencies."`) when the update affects a
   published package's runtime dependencies, and push. `ensureConsistentVersions` fails if the PR bumped a tool in
-  only some packages; bump the rest in the same branch.
+  only some packages; bump the rest in the same branch. A `vite-plus` bump must also bump the
+  `@voidzero-dev/vite-plus-core` version in the `globalOverrides` of `common/config/rush/pnpm-config.json`; the
+  comment there is the authoritative note.
 - **Dependabot GitHub Actions PRs** move an action to its next major version tag (for example `actions/checkout@v7`
   to `@v8`); minor and patch releases need no PR because workflows reference the major tag. Merge them for this
   repository's own workflows (`ci.yml`, `version-packages.yml`, `publish-npm.yml`). Close PRs that touch `review.yml` or another file

@@ -9,7 +9,11 @@ export default defineConfig({
     // One entry per subpath export: "." builds src/index.ts into dist/index.js with its declarations.
     entry: { index: "./src/index.ts" },
     format: "esm",
-    platform: "neutral",
+    // The Node platform resolves node: built-ins and their bare spellings; "neutral" would emit
+    // UNRESOLVED_IMPORT warnings for them, which Rush reports as build warnings and fails the check.
+    platform: "node",
+    // Extensionless output keeps dist/index.js and dist/index.d.ts, matching the exports map.
+    fixedExtension: false,
     // TypeScript 7 has no stable compiler API, so declarations come from Oxc's generator.
     dts: { generator: "oxc" }
   }

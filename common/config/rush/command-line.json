@@ -4,7 +4,7 @@
     {
       "commandKind": "bulk",
       "name": "lint",
-      "summary": "Run oxlint in every project.",
+      "summary": "Run vp lint in every project.",
       "enableParallelism": true
     },
     {
@@ -22,13 +22,13 @@
     {
       "commandKind": "bulk",
       "name": "format",
-      "summary": "Format every project with oxfmt.",
+      "summary": "Format every project with vp fmt.",
       "enableParallelism": true
     },
     {
       "commandKind": "bulk",
       "name": "format:check",
-      "summary": "Check formatting in every project with oxfmt.",
+      "summary": "Check formatting in every project with vp fmt.",
       "enableParallelism": true
     }
   ]
