@@ -3,6 +3,7 @@ version: 2
 updates:
   # Dependabot does not understand Rush: it edits package.json but not common/config/rush/pnpm-lock.yaml.
   # Before merging, push `rush update` output to the PR branch (see docs/development/release.md).
+  # A vite-plus bump must also bump the @voidzero-dev/vite-plus-core override in common/config/rush/pnpm-config.json.
   - package-ecosystem: "npm"
     directories:
       - "/packages/*"
@@ -15,11 +16,8 @@ updates:
     groups:
       toolchain:
         patterns:
-          - "oxfmt"
-          - "oxlint"
-          - "oxlint-tsgolint"
+          - "vite-plus"
           - "typescript"
-          - "vitest"
           - "@types/node"
     ignore:
       # Runtime types follow the Node LTS major pinned in .node-version.

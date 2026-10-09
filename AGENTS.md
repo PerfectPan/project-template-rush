@@ -33,7 +33,7 @@ npm run check
 # Individual gates (Rush bulk commands run in every project):
 npm run format        # or format:check
 npm run build
-npm run lint          # oxlint with type-aware rules and TypeScript diagnostics
+npm run lint          # vp lint: oxlint with type-aware rules and TypeScript diagnostics
 npm run typecheck
 npm run test
 

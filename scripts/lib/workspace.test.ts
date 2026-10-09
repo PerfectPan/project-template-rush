@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 
 import { isShippedChange, type ReleaseInput, releaseErrors, type RushProject } from "./workspace.ts";
 

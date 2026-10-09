@@ -14,8 +14,8 @@ contribution workflow (Spec + Plan), review checks, Git hooks and documentation 
 | Monorepo | Rush 5.180.0, pnpm 12.8.1 (workspaces), pinned in `rush.json` |
 | Runtime | The current Node.js LTS major in `.node-version` (`24`); CI resolves its latest patch. `engines` requires `^24.11.0` |
 | Language | TypeScript 7.0.2, `tsconfig` extends `@perfectpan/lint-config/tsconfig/node.json` |
-| Lint and format | oxlint 1.86.0 + oxlint-tsgolint (type-aware), oxfmt 0.71.0, shared configs from [`@perfectpan/lint-config`](https://github.com/PerfectPan/lint-config) v0.5.0 |
-| Tests | Vitest 5 |
+| Toolchain | Vite+ (`vp`) 1.1.0 for build (`vp pack`), lint (`vp lint`), format (`vp fmt`) and tests (`vp test`); shared settings from [`@perfectpan/lint-config`](https://github.com/PerfectPan/lint-config) v0.5.0; type check stays `tsc` |
+| Tests | Vitest 5 bundled in Vite+; test files import from `vite-plus/test` |
 | Releases | Rush change files, lockstep version policy `main`, npm Trusted Publishing with provenance |
 
 ## Quick Start
@@ -60,7 +60,7 @@ rush.json                     Rush projects and the Rush, pnpm and Node versions
 common/config/rush/           bulk commands, version policy, pnpm settings, lockfile
 common/changes/               pending Rush change files, consumed by Version Packages
 common/scripts/               install-run-rush.js and friends (managed by Rush; do not edit)
-packages/example/             example public library: src, Vitest test, tsc build to dist
+packages/example/             example public library: src, vp pack build to dist, vite-plus/test suite
 scripts/                      repo-scripts project (release-intent.ts, check-release.ts) and the template's shell checks
 .github/workflows/            ci.yml, review.yml, version-packages.yml, publish-npm.yml
 docs/development/release.md   release runbook
