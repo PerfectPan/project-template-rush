@@ -111,11 +111,12 @@ and changes nothing.
 ## Bot Pull Requests
 
 - **Release PR**: see step 3 above. Its title already passes `gh repo-checks pr-title`; bot PRs skip the description check.
-- **Dependabot npm PRs** edit `package.json` files but not the Rush lockfile, so `rush install` fails in CI. Check
-  out the branch, run `node common/scripts/install-run-rush.js update`, commit the lockfile, add a change file
-  (`node scripts/release-intent.ts add --type patch --message "Update dependencies."`) when the update affects a
-  published package's runtime dependencies, and push. `ensureConsistentVersions` fails if the PR bumped a tool in
-  only some packages; bump the rest in the same branch. A `vite-plus` bump must also bump the
+- **Dependabot npm PR**: one weekly PR carries every npm update. It edits `package.json` files but not the Rush
+  lockfile, so `rush install` fails in CI. Check out the branch, run `node common/scripts/install-run-rush.js update`,
+  commit the lockfile, add a change file (`node scripts/release-intent.ts add --type patch --message "Update
+  dependencies."`) when the update affects a published package's runtime dependencies, and push. Dependabot does not
+  change `peerDependencies`: move an exact peer by hand in the same branch, and bump any package it left behind there
+  too if `ensureConsistentVersions` fails. A `vite-plus` bump must also bump the
   `@voidzero-dev/vite-plus-core` version in the `globalOverrides` of `common/config/rush/pnpm-config.json`; the
   comment there is the authoritative note.
 - **Dependabot GitHub Actions PRs** move an action to its next major version tag (for example `actions/checkout@v7`
