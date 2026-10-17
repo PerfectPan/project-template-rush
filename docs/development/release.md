@@ -78,7 +78,9 @@ authentication error for that package only.
 2. Run **Actions → Version Packages → Run workflow** on `main`. Choose `policy` for the policy's `nextBump`, or
    `patch`/`minor`/`major`. The workflow runs `rush version --bump`, which consumes the change files, bumps the
    policy and package versions and writes changelogs, then `rush update`, and opens or updates the signed draft PR
-   `chore(release): version packages` from `rush-release/main`.
+   `chore(release): version packages` from `rush-release/main`. The PR body is the output of
+   `scripts/release-notes.ts`: the fixed intro followed by each policy package's `## <name>@<version>` section from
+   its `CHANGELOG.md`, cut with a pointer to the CHANGELOG files when it passes GitHub's pull request body limit.
 3. Start CI on the release PR. Pull requests created with the workflow's `GITHUB_TOKEN` do not trigger workflows.
    Select **Ready for review** (the `ready_for_review` event starts CI), or close and reopen the PR. Pushing an
    empty commit to the branch also works. To avoid the manual step, give `create-pull-request` a GitHub App token
