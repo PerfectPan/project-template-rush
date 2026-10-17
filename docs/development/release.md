@@ -7,7 +7,7 @@ long-lived npm token is stored in the repository or its secrets.
 | Step | Where | Result |
 | --- | --- | --- |
 | Change file | feature PR | `common/changes/<package>/*.json`, verified by CI |
-| Version Packages | `version-packages.yml` (manual) | draft PR `chore(release): version packages` on `rush-release/main` |
+| Version Packages | `version-packages.yml` (manual) | draft PR `chore(release): version packages` on `rush-release/main`; the PR body lists each package's changelog section |
 | Release PR merge | GitHub | bumped `package.json` versions, `CHANGELOG.md`/`CHANGELOG.json`, updated lockfile on `main` |
 | GitHub Release | GitHub UI or `gh release create` | tag `vX.Y.Z` on the release commit |
 | Publish | `publish-npm.yml` (on Release `published`) | packages on npm with provenance |
@@ -28,8 +28,9 @@ To version packages independently, switch the policy to `individualVersion`:
 [{ "policyName": "main", "definitionName": "individualVersion" }]
 ```
 
-Rush then bumps each package from the bump types in its own change files. Update the workflows to match: `scripts/check-release.ts` skips the tag-equals-version rule for `individualVersion`, so choose
-a tag scheme (for example `release-2026-10-01`) and document it here. To rename the policy, update
+Rush then bumps each package from the bump types in its own change files. Update the workflows to match: `scripts/check-release.ts` skips the tag-equals-version rule for `individualVersion`, and `scripts/release-notes.ts`, which renders the release PR body from the policy's packages, exits 1 without exactly one
+`lockStepVersion` policy. Choose a tag scheme (for example `release-2026-10-01`) and document it here. To rename
+the policy, update
 `version-policies.json`, every `versionPolicyName` in `rush.json`, and the `--version-policy main` arguments in
 `package.json` and `.github/workflows/`.
 
@@ -80,7 +81,8 @@ authentication error for that package only.
    policy and package versions and writes changelogs, then `rush update`, and opens or updates the signed draft PR
    `chore(release): version packages` from `rush-release/main`. The PR body is the output of
    `scripts/release-notes.ts`: the fixed intro followed by each policy package's `## <name>@<version>` section from
-   its `CHANGELOG.md`, cut with a pointer to the CHANGELOG files when it passes GitHub's pull request body limit.
+   its `CHANGELOG.md`. The script cuts the body at a package boundary and points at the CHANGELOG files before
+   create-pull-request would truncate it mid-section at GitHub's 65,536-character limit.
 3. Start CI on the release PR. Pull requests created with the workflow's `GITHUB_TOKEN` do not trigger workflows.
    Select **Ready for review** (the `ready_for_review` event starts CI), or close and reopen the PR. Pushing an
    empty commit to the branch also works. To avoid the manual step, give `create-pull-request` a GitHub App token
