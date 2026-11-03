@@ -75,7 +75,7 @@ authentication error for that package only.
 ## Cutting a Release
 
 1. Merge feature PRs with change files (`npm run change`). CI runs `rush change --verify` and
-   `scripts/release-intent.ts check` on every PR except the release PR and Dependabot PRs.
+   `scripts/release-intent.ts check` on Ready PRs except the release PR and Dependabot PRs.
 2. Run **Actions → Version Packages → Run workflow** on `main`. Choose `policy` for the policy's `nextBump`, or
    `patch`/`minor`/`major`. The workflow runs `rush version --bump`, which consumes the change files, bumps the
    policy and package versions and writes changelogs, then `rush update`, and opens or updates the signed draft PR
@@ -83,10 +83,12 @@ authentication error for that package only.
    `scripts/release-notes.ts`: the fixed intro followed by each policy package's `## <name>@<version>` section from
    its `CHANGELOG.md`. The script cuts the body at a package boundary and points at the CHANGELOG files before
    create-pull-request would truncate it mid-section at GitHub's 65,536-character limit.
-3. Start CI on the release PR. Pull requests created with the workflow's `GITHUB_TOKEN` do not trigger workflows.
-   Select **Ready for review** (the `ready_for_review` event starts CI), or close and reopen the PR. Pushing an
-   empty commit to the branch also works. To avoid the manual step, give `create-pull-request` a GitHub App token
-   or a fine-grained PAT instead of `GITHUB_TOKEN`.
+3. Review the Draft release PR, then select **Ready for review** to start the full `check` job. Later commits
+   on a Ready PR also run CI, but Version Packages returns the PR to Draft on each update, so a maintainer must
+   mark it Ready again. Reopening or pushing a commit while it is still Draft does not execute full CI.
+   GitHub may require approval for runs from PRs created or updated with `GITHUB_TOKEN`; approve the requested
+   run when needed ([current GitHub behavior](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow#triggering-a-workflow-from-a-workflow)).
+   This flow keeps the existing token and permissions. A skipped Draft job is not a passing test run.
 4. Review the version and changelog diff, wait for green checks, and squash-merge.
 5. Check the release identity locally on the merged release commit:
 
@@ -151,9 +153,10 @@ and changes nothing.
   and blocks the version number permanently; prefer deprecation.
 - Once any package of a version is on npm, do not move or reuse its tag. Fix forward with a new version.
 
-## CI Trigger Options
+## CI Trigger Policy
 
-`ci.yml` runs on ordinary `pull_request` and `push` events, which is enough for a single-maintainer repository. A
-repository that wants CI to validate an exact head/base pair, or to skip CI on drafts, can replace it with a
-`workflow_dispatch` workflow that takes `head_sha`/`base_sha` inputs and re-checks the PR head before and after the
-run. That design costs a manual trigger per PR; adopt it only when stale or racing CI results are a real problem.
+`ci.yml` listens to PR creation, new commits, reopening and Ready transitions. Its full `check` job runs only
+when the PR event is non-Draft; main pushes retain their existing full check run. Lightweight `Review` checks
+continue during Draft work and metadata edits. Neither workflow change grants permissions or publishes a
+package. See [CI Execution Policy](../../CONTRIBUTING.md#ci-execution-policy) for the shared policy and the
+requirement to inspect an actually executed check for the current PR comparison before merging.
