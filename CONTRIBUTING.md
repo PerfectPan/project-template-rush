@@ -56,7 +56,7 @@ Small typo corrections, narrow documentation fixes, and repository metadata upda
 # Aggregate gate: format:check, build, lint, typecheck, test, repository checks:
 npm run check
 
-# Change files for package changes (compares with origin/main; CI runs it on every PR):
+# Change files for package changes (compares with origin/main; CI runs it on Ready PRs):
 npm run change:verify
 
 # PR/MR title:
@@ -71,6 +71,25 @@ gh repo-checks protect --repo OWNER/REPO
 # Package or release dry-run:
 npm run publish:dry-run
 ```
+
+## CI Execution Policy
+
+The full `CI` workflow runs for Ready PRs when they are opened, updated with new commits (`synchronize`),
+reopened, or changed from Draft to Ready. Its `check` job skips Draft PR events; the existing `push` to `main`
+trigger still runs the full checks. This follows the [base template's CI policy](https://github.com/PerfectPan/project-template/pull/9)
+without replacing the Rush setup, validation commands or release workflows. Preserve any existing necessary
+manual triggers when applying this policy to a downstream project.
+
+Keep work in Draft until local checks are finished. A skipped job reports success to GitHub, including required
+checks, but is not test evidence. Mark the PR Ready and confirm that `check` actually executed and passed for
+the current head and merge result before merging. Version Packages continues to return release PRs to Draft
+on each update, so a maintainer reviews them and marks them Ready again.
+
+The separate `Review` workflow only checks repository hygiene, title and description. It remains active on
+Draft PRs and metadata edits; Bot authors skip only the description check. Full CI does not run for metadata
+edits. After a base-only change, update the comparison and request a fresh PR run by updating the branch or
+selecting Draft then Ready. Preserve existing required check names when adopting the policy; workflow files
+do not configure branch protection or rulesets.
 
 ## Change Files
 

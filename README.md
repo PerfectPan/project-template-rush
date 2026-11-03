@@ -83,10 +83,12 @@ The root `package.json` is not a Rush project. Its scripts call `common/scripts/
 
 ## CI and Releases
 
-- `ci.yml` runs `npm run check` on pull requests and `main`, and on pull requests also requires Rush change files
-  for package changes. It caches Rush's pnpm store and npm cache, keyed by the lockfile. Private repositories pay for
-  Actions minutes: there, consider running CI only on `ready_for_review` plus `workflow_dispatch` instead of every push.
-- `review.yml` (from the upstream template) checks repository hygiene, the PR title and the PR description.
+- `ci.yml` runs `npm run check` on Ready PR creation, new commits, reopening and Draft-to-Ready transitions, and
+  keeps the existing `main` push checks. Draft PR events skip the full job; keep unfinished work in Draft to avoid
+  full runs before it is ready. PR checks also require Rush change files for package changes. Dependency downloads
+  are cached using the lockfile. See [CI Execution Policy](CONTRIBUTING.md#ci-execution-policy).
+- `review.yml` (from the upstream template) checks repository hygiene, the PR title and the PR description,
+  including during Draft work and metadata edits.
 - `version-packages.yml` (manual) opens the draft PR `chore(release): version packages`.
 - `publish-npm.yml` publishes when a non-prerelease GitHub Release is published.
 - Dependabot updates npm dependencies and GitHub Actions weekly with `chore(deps)` titles.
