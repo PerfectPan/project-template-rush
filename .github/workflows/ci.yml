@@ -39,7 +39,9 @@ jobs:
       - run: node common/scripts/install-run-rush.js install
       - run: npm run check
       - name: Require change files for package changes
-        # The version PR consumes change files, and dependency bots cannot write them.
+        # The version PR consumes change files, and dependency bots cannot write them. The release
+        # machinery ships for the repositories copied from this template; the template itself does
+        # not publish, so its own origin is exempt and spawned repos keep the gate.
         if: >-
           github.event_name == 'pull_request' &&
           github.head_ref != 'rush-release/main' &&
@@ -47,6 +49,10 @@ jobs:
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
+          if git remote get-url origin | grep -q 'PerfectPan/project-template-rush'; then
+            echo "change files are not required in the template repository itself"
+            exit 0
+          fi
           base="$(git merge-base "$BASE_SHA" HEAD)"
           node common/scripts/install-run-rush.js change --verify --no-fetch --target-branch "$base"
           node scripts/release-intent.ts check --base "$base"
