@@ -2,10 +2,15 @@
 
 ## Development Setup
 
-Requirements: the exact Node.js version in `.node-version` (26.13.1) and Git. Rush and pnpm are downloaded on demand
-at the versions pinned in `rush.json`; a global install is optional.
+Requirements: Node.js `^26.13.1` (`>=26.13.1 <27`) and Git. `.node-version` selects major 26 for
+version managers; install its latest release. The private root `engines.node` and Rush's
+`nodeSupportedVersionRange` enforce the security floor. Rush and pnpm are downloaded on demand at the
+versions pinned in `rush.json`; a global install is optional. CI resolves the latest matching Node release
+with `actions/setup-node` and `check-latest: true`.
 
-CI and local development use the exact Node.js security release in `.node-version`. Update the private root runtime gates with that pin; published package minimums and `@types/node` stay on their supported consumer baseline unless the source requires a separate compatibility change. Workflows reference actions by their latest major tag.
+Later Node 26 patches and minors are permitted; Node 27 requires a separate upgrade. Published package
+minimums and `@types/node` stay on their supported consumer baseline unless the source requires a separate
+compatibility change. Workflows reference actions by their latest major tag.
 
 ```bash
 # install local Git hooks
