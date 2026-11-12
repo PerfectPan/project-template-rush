@@ -12,7 +12,7 @@ contribution workflow (Spec + Plan), review checks, Git hooks and documentation 
 | Concern | Choice |
 | --- | --- |
 | Monorepo | Rush 5.180.0, pnpm 12.8.1 (workspaces), pinned in `rush.json` |
-| Runtime | The current Node.js LTS major in `.node-version` (`24`); CI resolves its latest patch. `engines` requires `^24.11.0` |
+| Runtime | Node.js `26.13.1` from `.node-version`; CI uses the same exact version. `engines` requires `26.13.1` |
 | Language | TypeScript 7.0.2, `tsconfig` extends `@perfectpan/lint-config/tsconfig/node.json` |
 | Toolchain | Vite+ (`vp`) 1.1.0 for build (`vp pack`), lint (`vp lint`), format (`vp fmt`) and tests (`vp test`); shared settings from [`@perfectpan/lint-config`](https://github.com/PerfectPan/lint-config) v0.7.0; type check stays `tsc` |
 | Tests | Vitest 5 bundled in Vite+; test files import from `vite-plus/test` |

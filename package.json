@@ -17,6 +17,6 @@
     "publish:dry-run": "node common/scripts/install-run-rush.js publish --include-all --version-policy main --set-access-level public"
   },
   "engines": {
-    "node": "^24.11.0"
+    "node": "26.13.1"
   }
 }
