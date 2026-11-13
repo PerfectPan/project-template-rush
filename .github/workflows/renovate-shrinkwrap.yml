@@ -2,9 +2,11 @@ name: Renovate shrinkwrap
 
 # Renovate edits package.json but does not understand Rush (renovatebot/renovate#3681): it leaves
 # common/config/rush/pnpm-lock.yaml stale, and `rush install` fails on an outdated shrinkwrap.
-# After a Renovate dependency PR opens or updates, run `rush update` here, push the refreshed
-# shrinkwrap, and re-dispatch CI on the new commit: a push made with the GITHUB_TOKEN does not
-# trigger the pull_request synchronize event by itself, so ci.yml must also allow workflow_dispatch.
+# Run `rush update` on every Renovate branch, push the refreshed shrinkwrap, and re-dispatch CI on
+# the new commit. Both triggers are needed: Renovate defaults to prCreation "pending", so the
+# branch often exists before its pull request does (push event), and later commits land on the
+# already-opened PR (pull_request event). A push made with the GITHUB_TOKEN does not trigger
+# either event by itself, so ci.yml must also allow workflow_dispatch.
 
 on:
   pull_request:
@@ -14,24 +16,27 @@ on:
       - "rush.json"
       - "common/config/rush/pnpm-config.json"
       - "renovate.json"
+  push:
+    branches:
+      - "renovate/**"
 
 permissions:
   contents: write
 
 concurrency:
-  group: renovate-shrinkwrap-${{ github.event.pull_request.number }}
+  group: renovate-shrinkwrap-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
   shrinkwrap:
-    if: startsWith(github.head_ref, 'renovate/')
+    if: startsWith(github.head_ref || github.ref_name, 'renovate/')
     name: shrinkwrap
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ github.head_ref }}
+          ref: ${{ github.head_ref || github.ref_name }}
           fetch-depth: 0
       - uses: actions/setup-node@v7
         with:
@@ -49,7 +54,7 @@ jobs:
       - name: Push the refreshed shrinkwrap and re-dispatch CI
         env:
           GH_TOKEN: ${{ github.token }}
-          BRANCH: ${{ github.head_ref }}
+          BRANCH: ${{ github.head_ref || github.ref_name }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
