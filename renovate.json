@@ -1,0 +1,89 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  // Renovate does not understand Rush (renovatebot/renovate#3681): it edits package.json but not
+  // common/config/rush/pnpm-lock.yaml, and ensureConsistentVersions needs a dependency moved in every
+  // package at once. The renovate-shrinkwrap workflow closes the gap: after a dependency PR opens it
+  // runs `rush update`, pushes the refreshed shrinkwrap to the branch, and re-dispatches CI on the
+  // new commit. minimumReleaseAge must not be shorter than minimumReleaseAgeMinutes in
+  // common/config/rush/pnpm-config.json.
+  "extends": ["config:recommended"],
+  "enabledManagers": ["npm", "github-actions"],
+  "automerge": false,
+  "ignorePaths": ["**/node_modules/**", "common/temp/**"],
+  "timezone": "Asia/Shanghai",
+  "schedule": ["* 0-6 * * 1"],
+  "minimumReleaseAge": "7 days",
+  "rangeStrategy": "bump",
+  "prConcurrentLimit": 5,
+  "osvVulnerabilityAlerts": true,
+  "semanticCommits": "enabled",
+  "semanticCommitType": "chore",
+  "semanticCommitScope": "deps",
+  "prBodyNotes": [
+    "Bot PRs land with an updated Rush shrinkwrap: the renovate-shrinkwrap workflow runs `rush update` on the branch, pushes `common/config/rush/pnpm-lock.yaml`, and re-dispatches CI."
+  ],
+  "packageRules": [
+    {
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "GitHub Actions minor and patch"
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["major"],
+      "groupName": null
+    },
+    {
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "npm minor and patch"
+    },
+    {
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "npm major"
+    },
+    {
+      // vite-plus and its core alias ship on the same release train; grouping keeps this PR and the
+      // vite@* global override in common/config/rush/pnpm-config.json on one branch.
+      "extends": ["packages:vitePlus"],
+      "matchPackageNames": ["vite-plus", "@voidzero-dev/vite-plus-core"],
+      "groupName": "vite-plus toolchain"
+    },
+    {
+      // Runtime types follow the Node LTS major pinned in .node-version.
+      "matchPackageNames": ["@types/node"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    },
+    {
+      // lint-config is a git dependency whose upgrades land with their code fixes; Renovate misreads
+      // its tags and proposes downgrades (v0.5.0 -> v0.3.2).
+      "matchPackageNames": ["@perfectpan/lint-config"],
+      "enabled": false
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Bump the vite@* global override in lockstep with the vite-plus toolchain (same release train)",
+      "managerFilePatterns": ["/^common\\/config\\/rush\\/pnpm-config\\.json$/"],
+      "matchStrings": [
+        "\"vite@\\*\":\\s*\"npm:@voidzero-dev/vite-plus-core@(?<currentValue>[^\"\\s]+)\""
+      ],
+      "depNameTemplate": "@voidzero-dev/vite-plus-core",
+      "datasourceTemplate": "npm"
+    },
+    {
+      "customType": "regex",
+      "description": "Track the pnpm version pinned in rush.json",
+      "managerFilePatterns": ["/^rush\\.json$/"],
+      "matchStrings": ["\"pnpmVersion\":\\s*\"(?<currentValue>[^\"\\s]+)\""],
+      "depNameTemplate": "pnpm",
+      "datasourceTemplate": "npm"
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "rangeStrategy": "bump"
+  }
+}

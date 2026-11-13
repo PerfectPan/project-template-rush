@@ -1,0 +1,64 @@
+name: Renovate shrinkwrap
+
+# Renovate edits package.json but does not understand Rush (renovatebot/renovate#3681): it leaves
+# common/config/rush/pnpm-lock.yaml stale, and `rush install` fails on an outdated shrinkwrap.
+# After a Renovate dependency PR opens or updates, run `rush update` here, push the refreshed
+# shrinkwrap, and re-dispatch CI on the new commit: a push made with the GITHUB_TOKEN does not
+# trigger the pull_request synchronize event by itself, so ci.yml must also allow workflow_dispatch.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - "**/package.json"
+      - "rush.json"
+      - "common/config/rush/pnpm-config.json"
+      - "renovate.json"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: renovate-shrinkwrap-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  shrinkwrap:
+    if: startsWith(github.head_ref, 'renovate/')
+    name: shrinkwrap
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "^26.13.1"
+          check-latest: true
+      - uses: actions/cache@v6
+        with:
+          path: |
+            common/temp/pnpm-store
+            ~/.npm/_cacache
+          key: ${{ runner.os }}-pnpm-store-v11-dependency-downloads-${{ hashFiles('rush.json', 'common/config/rush/pnpm-lock.yaml', 'common/config/rush/pnpm-config.json') }}
+          restore-keys: ${{ runner.os }}-pnpm-store-v11-dependency-downloads-
+      - name: Refresh the shrinkwrap
+        run: node common/scripts/install-run-rush.js update
+      - name: Push the refreshed shrinkwrap and re-dispatch CI
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add common/config/rush/pnpm-lock.yaml
+          if git diff --cached --quiet; then
+            echo "the shrinkwrap already matches the dependency changes"
+          else
+            git commit -m "chore(deps): update the rush shrinkwrap"
+            git push origin "$BRANCH"
+            gh workflow run ci.yml --ref "$BRANCH"
+            echo "pushed the refreshed shrinkwrap and re-dispatched CI on $BRANCH"
+          fi
